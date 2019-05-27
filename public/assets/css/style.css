@@ -1,0 +1,16 @@
+body {
+    margin: 0;
+}
+
+canvas {
+    position: relative;
+}
+
+div.notice {
+    font-family: 'Open Sans', sans-serif;
+    position: absolute;
+    z-index: 2;
+    bottom: 0;
+    color: #fff;
+    margin: 25px;
+}
