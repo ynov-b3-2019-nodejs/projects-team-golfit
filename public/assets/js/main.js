@@ -1,7 +1,7 @@
 let INTRO = 0;
 let DIRECTIONS = 1;
 let PLAYING = 2;
-let OUTTRO = 3;
+let OUTRO = 3;
 
 let level = 0;
 
@@ -341,13 +341,13 @@ function draw() {
                     strokes: strokes,
                     score: (score > 0) ? '+' + score : score
                 });
-                gameState = OUTTRO;
+                gameState = OUTRO;
             } else {
                 createHole();
             }
         }
         resetButton.draw();
-    } else if (gameState === OUTTRO) {
+    } else if (gameState === OUTRO) {
         textSize(75);
         textFont(font);
         fill('white');
@@ -357,11 +357,14 @@ function draw() {
         text("en " + strokes + " coups", width * .5 - 175, height * .3);
         textSize(50);
 
+
         if (score > 0) {
             text("Score: +" + score, width * .5 - 190, height * .4);
         } else {
             text("Score: " + score, width * .5 - 190, height * .4);
         }
+
+        createInput().position(width * .5 - 400, height * 5);
 
         text("Rejouer?", width * .5 - 150, height * .685);
         againButton.draw();
@@ -385,7 +388,7 @@ function mouseClicked() {
         if (resetButton.isClicked(mouseX, mouseY)) {
             resetHole();
         }
-    } else if (gameState === OUTTRO) {
+    } else if (gameState === OUTRO) {
         if (againButton.isClicked(mouseX, mouseY)) {
             socket.emit('starting');
             startNewGame();
@@ -411,7 +414,7 @@ function touchStarted() {
         if (resetButton.isClicked(mouseX, mouseY)) {
             resetHole();
         }
-    } else if (gameState === OUTTRO) {
+    } else if (gameState === OUTRO) {
         if (againButton.isClicked(mouseX, mouseY)) {
             socket.emit('starting');
             startNewGame();
