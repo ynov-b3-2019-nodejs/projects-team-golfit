@@ -48,7 +48,7 @@ let grassImgL;
 
 //let levels = [hole1,hole2,hole3,hole4,hole5,hole6,hole62,hole7,hole8,hole82,hole9];
 const levels = holes;
-let pars = [1,2,3,3,3,2,2,9,7,7,1];
+let pars = [1, 2, 3, 3, 3, 2, 2, 9, 7, 7, 1];
 let parScore = 31;
 let currentHole = [];
 
@@ -78,7 +78,7 @@ function preload() {
 function onPlayerSpawn(data) {
     console.log(data);
 
-    if((level+1) === data.data.level) {
+    if ((level + 1) === data.data.level) {
         balls[data.user] = createSprite(data.data.x, data.data.y);
         ballSecondaryImg.resize(25, 25);
         balls[data.user].addImage(ballSecondaryImg);
@@ -90,7 +90,7 @@ function onPlayerSpawn(data) {
 function onPlayerLeave(user) {
     notice(user + ' s\'est déconnecté.');
 
-    if(balls[user]) {
+    if (balls[user]) {
         balls[user].remove();
     }
 }
@@ -99,16 +99,18 @@ function setup() {
     socket = io.connect();
     socket.emit('connected', randomUser());
 
-    socket.on('notice', (data) => { notice(data); });
+    socket.on('notice', (data) => {
+        notice(data);
+    });
     socket.on('spawned', onPlayerSpawn);
     socket.on('leave', onPlayerLeave);
 
     createCanvas(windowWidth, windowHeight);
-    playButton = new Button(width/2-width/12,height*.55,width/6,height/8,playButtonImg);
-    controlsButton = new Button(width/2-width/12,height*.7,width/6,height/8,controlsButtonImg);
-    backButton = new Button(width*.05,height*.05,width/9,height/11,backButtonImg);
-    againButton = new Button(width/2 - width/18,height*.7,width/9,height/11,playButtonImg);
-    resetButton = new Button(width/2-width/16,25,width/8,height/16,resetButtonImg);
+    playButton = new Button(width / 2 - width / 12, height * .55, width / 6, height / 8, playButtonImg);
+    controlsButton = new Button(width / 2 - width / 12, height * .7, width / 6, height / 8, controlsButtonImg);
+    backButton = new Button(width * .05, height * .05, width / 9, height / 11, backButtonImg);
+    againButton = new Button(width / 2 - width / 18, height * .7, width / 9, height / 11, playButtonImg);
+    resetButton = new Button(width / 2 - width / 16, 25, width / 8, height / 16, resetButtonImg);
 
     walls = new Group();
     grasses = new Group();
@@ -118,61 +120,58 @@ function setup() {
 }
 
 function createHole() {
-    for(let r = 0;r<currentHole[0].length;r++){
-       for(let c = 0;c<currentHole[0][r].length;c++){
-            if(currentHole[0][r].charAt(c) == " " || currentHole[0][r].charAt(c) == "h" || currentHole[0][r].charAt(c) == "b"){
-                if (r % 2 == 0){
-                    if (c % 2 == 0){
-                        grass = createSprite((width/2 - (currentHole[0][r].length*25)/2) + 12.5 + c*25,(height/2 - (currentHole[0].length*25)/2) + 12.5 + r*25,25,25);
+    for (let r = 0; r < currentHole[0].length; r++) {
+        for (let c = 0; c < currentHole[0][r].length; c++) {
+            if (currentHole[0][r].charAt(c) == " " || currentHole[0][r].charAt(c) == "h" || currentHole[0][r].charAt(c) == "b") {
+                if (r % 2 == 0) {
+                    if (c % 2 == 0) {
+                        grass = createSprite((width / 2 - (currentHole[0][r].length * 25) / 2) + 12.5 + c * 25, (height / 2 - (currentHole[0].length * 25) / 2) + 12.5 + r * 25, 25, 25);
                         grassImgD.resize(26, 26);
                         grass.addImage(grassImgD);
                         grasses.add(grass);
-                    }
-                    else if (c % 2 == 1){
-                        grass = createSprite((width/2 - (currentHole[0][r].length*25)/2) + 12.5 + c*25,(height/2 - (currentHole[0].length*25)/2) + 12.5 + r*25,25,25);
+                    } else if (c % 2 == 1) {
+                        grass = createSprite((width / 2 - (currentHole[0][r].length * 25) / 2) + 12.5 + c * 25, (height / 2 - (currentHole[0].length * 25) / 2) + 12.5 + r * 25, 25, 25);
                         grassImgL.resize(26, 26);
                         grass.addImage(grassImgL);
                         grasses.add(grass);
                     }
-                }
-                else if (r % 2 == 1){
-                    if (c % 2 == 0){
-                        grass = createSprite((width/2 - (currentHole[0][r].length*25)/2) + 12.5 + c*25,(height/2 - (currentHole[0].length*25)/2) + 12.5 + r*25,25,25);
+                } else if (r % 2 == 1) {
+                    if (c % 2 == 0) {
+                        grass = createSprite((width / 2 - (currentHole[0][r].length * 25) / 2) + 12.5 + c * 25, (height / 2 - (currentHole[0].length * 25) / 2) + 12.5 + r * 25, 25, 25);
                         grassImgL.resize(26, 26);
                         grass.addImage(grassImgL);
                         grasses.add(grass);
-                    }
-                    else if (c % 2 == 1){
-                        grass = createSprite((width/2 - (currentHole[0][r].length*25)/2) + 12.5 + c*25,(height/2 - (currentHole[0].length*25)/2) + 12.5 + r*25,25,25);
+                    } else if (c % 2 == 1) {
+                        grass = createSprite((width / 2 - (currentHole[0][r].length * 25) / 2) + 12.5 + c * 25, (height / 2 - (currentHole[0].length * 25) / 2) + 12.5 + r * 25, 25, 25);
                         grassImgD.resize(26, 26);
                         grass.addImage(grassImgD);
                         grasses.add(grass);
                     }
                 }
             }
-            if(currentHole[0][r].charAt(c) == "1"){
-                let wall = createSprite((width/2 - (currentHole[0][r].length*25)/2) + 12.5 + c*25,(height/2 - (currentHole[0].length*25)/2) + 12.5 + r*25,25,25);
+            if (currentHole[0][r].charAt(c) == "1") {
+                let wall = createSprite((width / 2 - (currentHole[0][r].length * 25) / 2) + 12.5 + c * 25, (height / 2 - (currentHole[0].length * 25) / 2) + 12.5 + r * 25, 25, 25);
                 wallImg.resize(26, 26);
                 wall.addImage(wallImg);
                 wall.setCollider("rectangle");
                 wall.immovable = true;
                 walls.add(wall);
             }
-            if(currentHole[0][r].charAt(c) == "h"){
-                hole = createSprite((width/2 - (currentHole[0][r].length*25)/2) + 12.5 + c*25,(height/2 - (currentHole[0].length*25)/2) + 12.5 + r*25,25,25);
+            if (currentHole[0][r].charAt(c) == "h") {
+                hole = createSprite((width / 2 - (currentHole[0][r].length * 25) / 2) + 12.5 + c * 25, (height / 2 - (currentHole[0].length * 25) / 2) + 12.5 + r * 25, 25, 25);
                 holeImg.resize(25, 25);
                 hole.addImage(holeImg);
-                hole.setCollider("circle",0,0,12.5,12.5);
+                hole.setCollider("circle", 0, 0, 12.5, 12.5);
             }
-            if(currentHole[0][r].charAt(c) == "b"){
-                ball = createSprite((width/2 - (currentHole[0][r].length*25)/2) + 12.5 + c*25,(height/2 - (currentHole[0].length*25)/2) + 12.5 + r*25,25,25);
+            if (currentHole[0][r].charAt(c) == "b") {
+                ball = createSprite((width / 2 - (currentHole[0][r].length * 25) / 2) + 12.5 + c * 25, (height / 2 - (currentHole[0].length * 25) / 2) + 12.5 + r * 25, 25, 25);
                 ballImg.resize(25, 25);
                 ball.addImage(ballImg);
-                ball.setCollider("circle",0,0,12.5,12.5);
+                ball.setCollider("circle", 0, 0, 12.5, 12.5);
                 ball.friction = 0.15;
             }
-            if(currentHole[0][r].charAt(c) == "s"){
-                sand = createSprite((width/2 - (currentHole[0][r].length*25)/2) + 12.5 + c*25,(height/2 - (currentHole[0].length*25)/2) + 12.5 + r*25,25,25);
+            if (currentHole[0][r].charAt(c) == "s") {
+                sand = createSprite((width / 2 - (currentHole[0][r].length * 25) / 2) + 12.5 + c * 25, (height / 2 - (currentHole[0].length * 25) / 2) + 12.5 + r * 25, 25, 25);
                 sandImg.resize(26, 26);
                 sand.addImage(sandImg);
                 sand.setCollider("rectangle");
@@ -180,10 +179,14 @@ function createHole() {
             }
         }
     }
-    socket.emit('spawn', { level: level+1, x: ball.position.x, y: ball.position.y });
+    socket.emit('spawn', {
+        level: level + 1,
+        x: ball.position.x,
+        y: ball.position.y
+    });
 }
 
-function removeHole(){
+function removeHole() {
     walls.removeSprites();
     grasses.removeSprites();
     sands.removeSprites();
@@ -191,12 +194,12 @@ function removeHole(){
     hole.remove();
     currentHole.pop();
 
-    for(let i = 0; i < balls.length; i++) {
+    for (let i = 0; i < balls.length; i++) {
         balls[i].remove();
     }
 
-    if(level < 11) {
-       currentHole.push(levels[level]); 
+    if (level < 11) {
+        currentHole.push(levels[level]);
     }
 }
 
@@ -218,29 +221,29 @@ function resetHole() {
 }
 
 function meter() {
-    if(mouseIsPressed && ball.overlapPoint(mouseX,mouseY)) {
+    if (mouseIsPressed && ball.overlapPoint(mouseX, mouseY)) {
         onBall = true;
     }
-    if(mouseIsPressed && onBall) {
-        if(Math.abs(ball.velocity.x) < .05 && Math.abs(ball.velocity.y) < .05) {
+    if (mouseIsPressed && onBall) {
+        if (Math.abs(ball.velocity.x) < .05 && Math.abs(ball.velocity.y) < .05) {
             meterLength = dist(ball.position.x, ball.position.y, mouseX, mouseY);
             let cx = (mouseX - ball.position.x);
             let cy = (mouseY - ball.position.y);
 
-            if(meterLength <= 160){
+            if (meterLength <= 160) {
                 nx = cx;
                 ny = cy;
             } else {
-                nx = 160*cx/meterLength;
-                ny = 160*cy/meterLength;
+                nx = 160 * cx / meterLength;
+                ny = 160 * cy / meterLength;
             }
             strokeWeight(20);
-    
-            if(meterLength < 160*.25) {
+
+            if (meterLength < 160 * .25) {
                 stroke('green');
-            } else if(meterLength < 160*.5) {
+            } else if (meterLength < 160 * .5) {
                 stroke('yellow');
-            } else if(meterLength < 160*.75) {
+            } else if (meterLength < 160 * .75) {
                 stroke('orangered');
             } else {
                 stroke('red');
@@ -257,7 +260,10 @@ function shot() {
     let tx = -nx * .75;
     let ty = -ny * .75;
     ball.setVelocity(tx, ty);
-    socket.emit('shot', { tx: tx, ty: ty });
+    socket.emit('shot', {
+        tx: tx,
+        ty: ty
+    });
 }
 
 function notice(str) {
@@ -268,7 +274,7 @@ function draw() {
     background(bgImg);
 
     if (gameState === INTRO) {
-        image(titleImg,0,0,width,height);
+        image(titleImg, 0, 0, width, height);
         playButton.draw();
         controlsButton.draw();
     } else if (gameState === DIRECTIONS) {
@@ -276,110 +282,111 @@ function draw() {
         textSize(50);
         textFont(font);
         fill('white');
-        
-        text("Cliquez et relâchez", width*.45,height*.15);
-        text("la balle pour tirer", width*.45,height*.15 + 50);
-        image(shotDemoImg,width*.35-100,height*.15-100,200,200);
-        
-        text("Évitez les obstacles",500,height*.525);
-        image(obstacleDemoImg,width*.85-100,height*.5-100,200,200);
-        
-        text("Finissez le parcours en",350,height*.8);
-        text("moins de coups possible",350,height*.8 + 50);
-        image(holeDemoImg,75,height*.8-100,200,200);
+
+        text("Cliquez et relâchez", width * .45, height * .15);
+        text("la balle pour tirer", width * .45, height * .15 + 50);
+        image(shotDemoImg, width * .35 - 100, height * .15 - 100, 200, 200);
+
+        text("Évitez les obstacles", 500, height * .525);
+        image(obstacleDemoImg, width * .85 - 100, height * .5 - 100, 200, 200);
+
+        text("Finissez le parcours en", 350, height * .8);
+        text("moins de coups possible", 350, height * .8 + 50);
+        image(holeDemoImg, 75, height * .8 - 100, 200, 200);
     } else if (gameState === PLAYING) {
         fill('White');
         textSize(50);
         textFont(font);
 
-        if(level < 6) {
-            text("Trou " + (level+1),25, 50);
-        } else if(level >= 6 && level < 9) {
-            text("Trou " + level,25, 50);
+        if (level < 6) {
+            text("Trou " + (level + 1), 25, 50);
+        } else if (level >= 6 && level < 9) {
+            text("Trou " + level, 25, 50);
         } else {
-            text("Trou " + (level-1),25, 50);
+            text("Trou " + (level - 1), 25, 50);
         }
 
-        text("Coups: " + strokes,width-325, 50);
+        text("Coups: " + strokes, width - 325, 50);
         drawSprites();
 
-        if(level === 10) {
+        if (level === 10) {
             hole.bounce(walls);
-            if(frameCount % 60 == 0){
-                hole.setVelocity(random(-10,10), random(-10,10));
+            if (frameCount % 60 == 0) {
+                hole.setVelocity(random(-10, 10), random(-10, 10));
             }
         }
 
-        text("Par " + pars[level],25, 112);
+        text("Par " + pars[level], 25, 112);
         meter();
 
         drawSprite(ball);
         drawSprite(hole);
         ball.bounce(walls);
 
-        if(ball.overlap(sands)) {
+        if (ball.overlap(sands)) {
             ball.friction = .65;
         } else {
             ball.friction = .15;
         }
 
-        if(ball.overlap(hole)) {
-            socket.emit('hole', level+1);
+        if (ball.overlap(hole)) {
+            socket.emit('hole', level + 1);
 
             level++;
             removeHole();
 
-            if(level === 11) {
+            if (level === 11) {
                 score = strokes - parScore;
-                socket.emit('finished', { strokes: strokes, score: (score > 0) ? '+' + score : score });
+                socket.emit('finished', {
+                    strokes: strokes,
+                    score: (score > 0) ? '+' + score : score
+                });
                 gameState = OUTTRO;
             } else {
                 createHole();
             }
         }
         resetButton.draw();
-    }
-    else if (gameState === OUTTRO) {
+    } else if (gameState === OUTTRO) {
         textSize(75);
         textFont(font);
         fill('white');
-        text("Félicitations !", width*.5 - 400,height*.15);
+        text("Félicitations !", width * .5 - 400, height * .15);
         textSize(40);
-        text("Vous avez terminé le parcours",width*.5 - 450,height*.25);
-        text("en " + strokes + " coups", width*.5 - 175,height*.3);
+        text("Vous avez terminé le parcours", width * .5 - 450, height * .25);
+        text("en " + strokes + " coups", width * .5 - 175, height * .3);
         textSize(50);
 
-        if(score > 0){
-            text("Score: +" + score, width*.5 - 190,height*.4);
-        }
-        else{
-            text("Score: " + score, width*.5 - 190,height*.4);
+        if (score > 0) {
+            text("Score: +" + score, width * .5 - 190, height * .4);
+        } else {
+            text("Score: " + score, width * .5 - 190, height * .4);
         }
 
-        text("Rejouer?",width*.5 - 150,height*.685);
+        text("Rejouer?", width * .5 - 150, height * .685);
         againButton.draw();
     }
 }
 
 function mouseClicked() {
     if (gameState === INTRO) {
-        if(playButton.isClicked(mouseX,mouseY)){
+        if (playButton.isClicked(mouseX, mouseY)) {
             socket.emit('starting');
             gameState = PLAYING;
         }
-        if(controlsButton.isClicked(mouseX,mouseY)){
-          gameState = DIRECTIONS;
+        if (controlsButton.isClicked(mouseX, mouseY)) {
+            gameState = DIRECTIONS;
         }
     } else if (gameState === DIRECTIONS) {
-        if(backButton.isClicked(mouseX,mouseY)){
-          gameState = INTRO;
+        if (backButton.isClicked(mouseX, mouseY)) {
+            gameState = INTRO;
         }
     } else if (gameState === PLAYING) {
-      if(resetButton.isClicked(mouseX,mouseY)){
-          resetHole();
+        if (resetButton.isClicked(mouseX, mouseY)) {
+            resetHole();
         }
     } else if (gameState === OUTTRO) {
-        if(againButton.isClicked(mouseX,mouseY)){
+        if (againButton.isClicked(mouseX, mouseY)) {
             socket.emit('starting');
             startNewGame();
             gameState = PLAYING;
@@ -389,26 +396,23 @@ function mouseClicked() {
 
 function touchStarted() {
     if (gameState === INTRO) {
-        if(playButton.isClicked(mouseX,mouseY)){
+        if (playButton.isClicked(mouseX, mouseY)) {
             socket.emit('starting');
             gameState = PLAYING;
         }
-        if(controlsButton.isClicked(mouseX,mouseY)){
+        if (controlsButton.isClicked(mouseX, mouseY)) {
             gameState = DIRECTIONS;
         }
-    }
-    else if (gameState === DIRECTIONS) {
-        if(backButton.isClicked(mouseX,mouseY)){
+    } else if (gameState === DIRECTIONS) {
+        if (backButton.isClicked(mouseX, mouseY)) {
             gameState = INTRO;
         }
-    }
-    else if (gameState === PLAYING) {
-        if(resetButton.isClicked(mouseX,mouseY)){
+    } else if (gameState === PLAYING) {
+        if (resetButton.isClicked(mouseX, mouseY)) {
             resetHole();
         }
-    }
-    else if (gameState === OUTTRO) {
-        if(againButton.isClicked(mouseX,mouseY)){
+    } else if (gameState === OUTTRO) {
+        if (againButton.isClicked(mouseX, mouseY)) {
             socket.emit('starting');
             startNewGame();
             gameState = PLAYING;
@@ -417,15 +421,15 @@ function touchStarted() {
 }
 
 function mouseReleased() {
-    if(gameState === PLAYING && onBall){
+    if (gameState === PLAYING && onBall) {
         shot();
-    }    
+    }
 }
 
 function touchEnded() {
-    if(gameState === PLAYING && onBall){
+    if (gameState === PLAYING && onBall) {
         shot();
-    }    
+    }
 }
 
 function randomUser() {
