@@ -54,6 +54,7 @@ let currentHole = [];
 
 let socket;
 let score;
+let input;
 
 function preload() {
     bgImg = loadImage("assets/images/bg.jpg");
@@ -76,14 +77,15 @@ function preload() {
 }
 
 function onPlayerSpawn(data) {
-    console.log(data);
+    let { lvl, x, y } = data.data;
+    let user = data.user;
 
-    if ((level + 1) === data.data.level) {
-        balls[data.user] = createSprite(data.data.x, data.data.y);
+    if ((level + 1) === lvl) {
+        balls[user] = createSprite(x, y);
         ballSecondaryImg.resize(25, 25);
-        balls[data.user].addImage(ballSecondaryImg);
-        //balls[data.user].setCollider("circle",0,0,12.5,12.5);
-        balls[data.user].friction = 0.15;
+        balls[user].addImage(ballSecondaryImg);
+        balls[user].setCollider("circle", 0, 0, 12.5, 12.5);
+        balls[user].friction = 0.15;
     }
 }
 
@@ -95,15 +97,40 @@ function onPlayerLeave(user) {
     }
 }
 
-function setup() {
-    socket = io.connect();
-    socket.emit('connected', randomUser());
+function onPlayerShoot(data) {
+    let { lvl, tx, ty } = data.data;
+    let user = data.user;
 
+    if ((level + 1) === lvl) {
+        balls[user].setVelocity(tx, ty);
+    }
+}
+
+function onPlayerOverlap(data) {
+    let { lvl, user } = data;
+
+    if ((level + 1) === lvl) {
+        balls[user].remove();
+    }
+}
+
+function onPlayerGetUsers(data) {
+    console.log(data);
+}
+
+function setup() {
+    let username = randomUser();
+
+    socket = io.connect();
     socket.on('notice', (data) => {
         notice(data);
     });
+
     socket.on('spawned', onPlayerSpawn);
     socket.on('leave', onPlayerLeave);
+    socket.on('shoot', onPlayerShoot);
+    socket.on('overlap', onPlayerOverlap);
+    socket.on('users', onPlayerGetUsers);
 
     createCanvas(windowWidth, windowHeight);
     playButton = new Button(width / 2 - width / 12, height * .55, width / 6, height / 8, playButtonImg);
@@ -115,6 +142,8 @@ function setup() {
     walls = new Group();
     grasses = new Group();
     sands = new Group();
+
+    input = createInput(username).position(width / 2 - width / 12, height * .50);
 
     startNewGame();
 }
@@ -169,6 +198,14 @@ function createHole() {
                 ball.addImage(ballImg);
                 ball.setCollider("circle", 0, 0, 12.5, 12.5);
                 ball.friction = 0.15;
+
+                if(level !== 0) {
+                    socket.emit('spawn', {
+                        lvl: level + 1,
+                        x: ball.position.x,
+                        y: ball.position.y
+                    });
+                }
             }
             if (currentHole[0][r].charAt(c) == "s") {
                 sand = createSprite((width / 2 - (currentHole[0][r].length * 25) / 2) + 12.5 + c * 25, (height / 2 - (currentHole[0].length * 25) / 2) + 12.5 + r * 25, 25, 25);
@@ -179,11 +216,6 @@ function createHole() {
             }
         }
     }
-    socket.emit('spawn', {
-        level: level + 1,
-        x: ball.position.x,
-        y: ball.position.y
-    });
 }
 
 function removeHole() {
@@ -194,9 +226,9 @@ function removeHole() {
     hole.remove();
     currentHole.pop();
 
-    for (let i = 0; i < balls.length; i++) {
-        balls[i].remove();
-    }
+    balls.forEach((el) => {
+        el.remove();
+    });
 
     if (level < 11) {
         currentHole.push(levels[level]);
@@ -257,17 +289,20 @@ function shot() {
     onBall = false;
     meterLength = 0;
     strokes++;
+
     let tx = -nx * .75;
     let ty = -ny * .75;
     ball.setVelocity(tx, ty);
+
     socket.emit('shot', {
+        lvl: level + 1,
         tx: tx,
         ty: ty
     });
 }
 
 function notice(str) {
-    $('.notice').append('<p>' + str + '</p>');
+    $('.notice').append('<p class="system">' + str + '</p>');
 }
 
 function draw() {
@@ -275,6 +310,12 @@ function draw() {
 
     if (gameState === INTRO) {
         image(titleImg, 0, 0, width, height);
+
+        textSize(35);
+        textFont(font);
+        fill('white');
+        text("Pseudo", width / 2 - width / 20, height * .48);
+
         playButton.draw();
         controlsButton.draw();
     } else if (gameState === DIRECTIONS) {
@@ -311,7 +352,7 @@ function draw() {
 
         if (level === 10) {
             hole.bounce(walls);
-            if (frameCount % 60 == 0) {
+            if (frameCount % 60 === 0) {
                 hole.setVelocity(random(-10, 10), random(-10, 10));
             }
         }
@@ -329,15 +370,24 @@ function draw() {
             ball.friction = .15;
         }
 
+        balls.forEach((el) => {
+            el.bounce(walls);
+
+            if (el.overlap(sands)) {
+                el.friction = .65;
+            } else {
+                el.friction = .15;
+            }
+        });
+
         if (ball.overlap(hole)) {
             socket.emit('hole', level + 1);
-
             level++;
             removeHole();
 
             if (level === 11) {
                 score = strokes - parScore;
-                socket.emit('finished', {
+                socket.emit('finish', {
                     strokes: strokes,
                     score: (score > 0) ? '+' + score : score
                 });
@@ -357,14 +407,11 @@ function draw() {
         text("en " + strokes + " coups", width * .5 - 175, height * .3);
         textSize(50);
 
-
         if (score > 0) {
             text("Score: +" + score, width * .5 - 190, height * .4);
         } else {
             text("Score: " + score, width * .5 - 190, height * .4);
         }
-
-        createInput().position(width * .5 - 400, height * 5);
 
         text("Rejouer?", width * .5 - 150, height * .685);
         againButton.draw();
@@ -374,14 +421,22 @@ function draw() {
 function mouseClicked() {
     if (gameState === INTRO) {
         if (playButton.isClicked(mouseX, mouseY)) {
-            socket.emit('starting');
+            input.hide();
+            socket.emit('connected', input.value());
+            socket.emit('spawn', {
+                lvl: level + 1,
+                x: ball.position.x,
+                y: ball.position.y
+            });
             gameState = PLAYING;
         }
         if (controlsButton.isClicked(mouseX, mouseY)) {
+            input.hide();
             gameState = DIRECTIONS;
         }
     } else if (gameState === DIRECTIONS) {
         if (backButton.isClicked(mouseX, mouseY)) {
+            input.show();
             gameState = INTRO;
         }
     } else if (gameState === PLAYING) {
@@ -390,7 +445,7 @@ function mouseClicked() {
         }
     } else if (gameState === OUTRO) {
         if (againButton.isClicked(mouseX, mouseY)) {
-            socket.emit('starting');
+            socket.emit('restarting');
             startNewGame();
             gameState = PLAYING;
         }
@@ -400,14 +455,22 @@ function mouseClicked() {
 function touchStarted() {
     if (gameState === INTRO) {
         if (playButton.isClicked(mouseX, mouseY)) {
-            socket.emit('starting');
+            input.hide();
+            socket.emit('connected', input.value());
+            socket.emit('spawn', {
+                lvl: level + 1,
+                x: ball.position.x,
+                y: ball.position.y
+            });
             gameState = PLAYING;
         }
         if (controlsButton.isClicked(mouseX, mouseY)) {
+            input.hide();
             gameState = DIRECTIONS;
         }
     } else if (gameState === DIRECTIONS) {
         if (backButton.isClicked(mouseX, mouseY)) {
+            input.show();
             gameState = INTRO;
         }
     } else if (gameState === PLAYING) {
@@ -416,7 +479,7 @@ function touchStarted() {
         }
     } else if (gameState === OUTRO) {
         if (againButton.isClicked(mouseX, mouseY)) {
-            socket.emit('starting');
+            socket.emit('restarting');
             startNewGame();
             gameState = PLAYING;
         }
