@@ -9,7 +9,7 @@ let gameState = INTRO;
 let ballImg;
 
 let ball;
-let balls = [];
+let balls = {};
 
 let titleImg;
 let bgImg;
@@ -76,17 +76,49 @@ function preload() {
     obstacleDemoImg = loadImage("assets/images/obstacleDemo.jpg");
 }
 
+function drawPlayersBalls() {
+    Object.keys(balls).forEach((user) => {
+        if((level + 1) === balls[user]['lvl']) {
+            createPlayerBall(user, balls[user].position.x, balls[user].position.y);
+        }
+    });
+}
+
+function createPlayerBall(user, x, y) {
+    console.log('creating ball: ' + user);
+    destroyPlayerBall(user);
+
+    balls[user] = createSprite(x, y);
+    ballSecondaryImg.resize(25, 25);
+    balls[user].addImage(ballSecondaryImg);
+    balls[user].setCollider("circle", 0, 0, 12.5, 12.5);
+    balls[user].friction = 0.15;
+}
+
+function destroyPlayerBall(user) {
+    console.log('destroying ball (1): ' + user);
+    if (isPlayerBall(user)) {
+        console.log('destroying ball (2): ' + user);
+        balls[user].remove();
+    }
+}
+
+function isPlayerBall(user) {
+    return !!balls[user];
+}
+
 function onPlayerSpawn(data) {
     let { lvl, x, y } = data.data;
     let user = data.user;
 
     if ((level + 1) === lvl) {
-        balls[user] = createSprite(x, y);
-        ballSecondaryImg.resize(25, 25);
-        balls[user].addImage(ballSecondaryImg);
-        balls[user].setCollider("circle", 0, 0, 12.5, 12.5);
-        balls[user].friction = 0.15;
+        createPlayerBall(user, x, y);
+    } else {
+        balls[user].position.x = x;
+        balls[user].position.y = y;
     }
+
+    balls[user]['lvl'] = lvl;
 }
 
 function onPlayerLeave(user) {
@@ -94,29 +126,26 @@ function onPlayerLeave(user) {
 
     if (balls[user]) {
         balls[user].remove();
+        delete balls[user];
     }
 }
 
 function onPlayerShoot(data) {
     let { lvl, tx, ty } = data.data;
     let user = data.user;
-
-    if ((level + 1) === lvl) {
-        balls[user].setVelocity(tx, ty);
-    }
+    balls[user].setVelocity(tx, ty);
 }
 
 function onPlayerOverlap(data) {
     let { lvl, user } = data;
 
-    if ((level + 1) === lvl) {
-        balls[user].remove();
-    }
+    console.log(user + '  destroy');
+    destroyPlayerBall(user);
 }
 
-function onPlayerGetUsers(data) {
+/*function onPlayerGetUsers(data) {
     console.log(data);
-}
+}*/
 
 function setup() {
     let username = randomUser();
@@ -130,7 +159,7 @@ function setup() {
     socket.on('leave', onPlayerLeave);
     socket.on('shoot', onPlayerShoot);
     socket.on('overlap', onPlayerOverlap);
-    socket.on('users', onPlayerGetUsers);
+    //socket.on('users', onPlayerGetUsers);
 
     createCanvas(windowWidth, windowHeight);
     playButton = new Button(width / 2 - width / 12, height * .55, width / 6, height / 8, playButtonImg);
@@ -226,10 +255,6 @@ function removeHole() {
     hole.remove();
     currentHole.pop();
 
-    balls.forEach((el) => {
-        el.remove();
-    });
-
     if (level < 11) {
         currentHole.push(levels[level]);
     }
@@ -250,6 +275,7 @@ function resetHole() {
     ball.remove();
     hole.remove();
     createHole();
+    drawPlayersBalls();
 }
 
 function meter() {
@@ -280,6 +306,7 @@ function meter() {
             } else {
                 stroke('red');
             }
+
             line(ball.position.x, ball.position.y, ball.position.x + nx, ball.position.y + ny);
         }
     }
@@ -370,13 +397,14 @@ function draw() {
             ball.friction = .15;
         }
 
-        balls.forEach((el) => {
-            el.bounce(walls);
+        // Other players balls
+        Object.keys(balls).forEach((user) => {
+            balls[user].bounce(walls);
 
-            if (el.overlap(sands)) {
-                el.friction = .65;
+            if (balls[user].overlap(sands)) {
+                balls[user].friction = .65;
             } else {
-                el.friction = .15;
+                balls[user].friction = .15;
             }
         });
 
@@ -394,8 +422,10 @@ function draw() {
                 gameState = OUTRO;
             } else {
                 createHole();
+                drawPlayersBalls();
             }
         }
+
         resetButton.draw();
     } else if (gameState === OUTRO) {
         textSize(75);
