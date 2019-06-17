@@ -29,17 +29,14 @@ app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html');
 });
 
+
 io.sockets.on('connection', (socket) => {
 
     socket.on('connected', (username) => {
         users[username] = { lvl: 0, pos: { x: 0, y: 0 } };
         socket.username = username;
         socket.broadcast.emit('notice', username + ' a commencé une partie.')
-        db.query("INSERT INTO username (pseudo) VALUES ('"+username+"')", (err, result) => {
-        if(err) throw err;
-            console.log("Nouveau pseudo ajouté");
-            console.log(result)
-        });
+        
     });
 
     socket.on('disconnect', () => {
@@ -67,6 +64,11 @@ io.sockets.on('connection', (socket) => {
         socket.broadcast.emit('spawned', { data: data, user: socket.username });
         socket.emit('users', users);
         console.log(users);
+        db.query(`INSERT INTO username (pseudo, score) VALUES ("Titou", "0")`, (err, result) => {
+            if(err) throw err;
+                console.log("Nouveau pseudo ajouté");
+                console.log(result)
+            });
     });
 
     socket.on('shot', (data) => {
