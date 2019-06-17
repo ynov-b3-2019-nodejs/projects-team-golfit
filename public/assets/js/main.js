@@ -120,7 +120,6 @@ function onPlayerGetUsers(data) {
 
 function setup() {
     let username = randomUser();
-
     socket = io.connect();
     socket.on('notice', (data) => {
         notice(data);
@@ -144,7 +143,6 @@ function setup() {
     sands = new Group();
 
     input = createInput(username).position(width / 2 - width / 12, height * .50);
-
     startNewGame();
 }
 
@@ -305,7 +303,7 @@ function notice(str) {
     $('.notice').append('<p class="system">' + str + '</p>');
 }
 
-function draw() {
+function draw(user, score) {
     background(bgImg);
 
     if (gameState === INTRO) {
@@ -413,8 +411,8 @@ function draw() {
             text("Score: " + score, width * .5 - 190, height * .35);
         }
 
-        var html = 
-        "<table><th>Pseudo</th><th>Score</th><tr><td>Admin</td><td>456</td></tr><tr><td>Adrien</td><td>2</td></tr><tr><td>Titou</td><td>25</td></tr><tr><td>Admin</td><td>456</td></tr></table>";
+        let html = 
+        "<table><th>Pseudo</th><th>Score</th><tr><td>" + user + "</td><td>" + score + "</td></tr></table>";
         document.getElementById("table").innerHTML = html;
         againButton.draw();
     }
@@ -422,7 +420,6 @@ function draw() {
 
 function mouseClicked() {
     if (gameState === INTRO) {
-        gameState = OUTRO
         if (playButton.isClicked(mouseX, mouseY)) {
             input.hide();
             socket.emit('connected', input.value());
@@ -457,7 +454,6 @@ function mouseClicked() {
 
 function touchStarted() {
     if (gameState === INTRO) {
-        gameState = OUTRO
         if (playButton.isClicked(mouseX, mouseY)) {
             input.hide();
             socket.emit('connected', input.value());

@@ -2,6 +2,23 @@ const express = require('express');
 const app = express();
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
+const mysql = require('mysql');
+
+const db = mysql.createConnection ({
+    host: '127.0.0.1',
+    port: '8888',
+    user: 'root',
+    password: 'password',
+    database: 'golfit'
+});
+
+db.connect((err) => {
+    if (err) {
+        throw err;
+    }
+    console.log('Connexion à la DB');
+});
+global.db = db;
 
 server.listen(3000);
 app.use(express.static('public'));
@@ -17,7 +34,14 @@ io.sockets.on('connection', (socket) => {
     socket.on('connected', (username) => {
         users[username] = { lvl: 0, pos: { x: 0, y: 0 } };
         socket.username = username;
-        socket.broadcast.emit('notice', username + ' a commencé une partie.');
+        socket.broadcast.emit('notice', username + ' a commencé une partie.')
+        app.post('/', (req, res) => {
+            usernameData = username
+            connection.query("INSERT INTO `username` (pseudo) VALUES ('"+req.body.usernameData+"')", function(err, result){
+            if(err) throw err;
+                console.log("1 record inserted");
+            });
+        });
     });
 
     socket.on('disconnect', () => {
