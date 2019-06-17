@@ -136,7 +136,7 @@ function setup() {
     playButton = new Button(width / 2 - width / 12, height * .55, width / 6, height / 8, playButtonImg);
     controlsButton = new Button(width / 2 - width / 12, height * .7, width / 6, height / 8, controlsButtonImg);
     backButton = new Button(width * .05, height * .05, width / 9, height / 11, backButtonImg);
-    againButton = new Button(width / 2 - width / 18, height * .7, width / 9, height / 11, playButtonImg);
+    againButton = new Button(width / 2 - width / 18, height * .85, width / 9, height / 11, playButtonImg);
     resetButton = new Button(width / 2 - width / 16, 25, width / 8, height / 16, resetButtonImg);
 
     walls = new Group();
@@ -401,25 +401,28 @@ function draw() {
         textSize(75);
         textFont(font);
         fill('white');
-        text("Félicitations !", width * .5 - 400, height * .15);
+        text("Félicitations !", width * .5 - 400, height * .1);
         textSize(40);
-        text("Vous avez terminé le parcours", width * .5 - 450, height * .25);
-        text("en " + strokes + " coups", width * .5 - 175, height * .3);
+        text("Vous avez terminé le parcours", width * .5 - 450, height * .2);
+        text("en " + strokes + " coups", width * .5 - 175, height * .25);
         textSize(50);
 
         if (score > 0) {
-            text("Score: +" + score, width * .5 - 190, height * .4);
+            text("Score: +" + score, width * .5 - 190, height * .35);
         } else {
-            text("Score: " + score, width * .5 - 190, height * .4);
+            text("Score: " + score, width * .5 - 190, height * .35);
         }
 
-        text("Rejouer?", width * .5 - 150, height * .685);
+        var html = 
+        "<table><th>Pseudo</th><th>Score</th><tr><td>Admin</td><td>456</td></tr><tr><td>Adrien</td><td>2</td></tr><tr><td>Titou</td><td>25</td></tr><tr><td>Admin</td><td>456</td></tr></table>";
+        document.getElementById("table").innerHTML = html;
         againButton.draw();
     }
 }
 
 function mouseClicked() {
     if (gameState === INTRO) {
+        gameState = OUTRO
         if (playButton.isClicked(mouseX, mouseY)) {
             input.hide();
             socket.emit('connected', input.value());
@@ -454,6 +457,7 @@ function mouseClicked() {
 
 function touchStarted() {
     if (gameState === INTRO) {
+        gameState = OUTRO
         if (playButton.isClicked(mouseX, mouseY)) {
             input.hide();
             socket.emit('connected', input.value());
