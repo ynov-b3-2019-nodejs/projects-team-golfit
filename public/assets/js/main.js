@@ -435,14 +435,8 @@ function draw(user, score) {
         text("en " + strokes + " coups", width * .5 - 175, height * .25);
         textSize(50);
 
-        if (score > 0) {
-            text("Score: +" + score, width * .5 - 190, height * .35);
-        } else {
-            text("Score: " + score, width * .5 - 190, height * .35);
-        }
-
         let html = 
-        "<table><th>Pseudo</th><th>Score</th><tr><td>" + user + "</td><td>" + score + "</td></tr></table>";
+        "<table><th>Pseudo</th><th>Score</th><tr><td>" + "Titou" + "</td><td>" + "34" + "</td></tr></table>";
         document.getElementById("table").innerHTML = html;
         againButton.draw();
     }
@@ -475,6 +469,7 @@ function mouseClicked() {
         }
     } else if (gameState === OUTRO) {
         if (againButton.isClicked(mouseX, mouseY)) {
+            document.getElementById("table").style.display = "none";
             socket.emit('restarting');
             startNewGame();
             gameState = PLAYING;
@@ -509,6 +504,7 @@ function touchStarted() {
         }
     } else if (gameState === OUTRO) {
         if (againButton.isClicked(mouseX, mouseY)) {
+            document.getElementById("table").style.display = "none";
             socket.emit('restarting');
             startNewGame();
             gameState = PLAYING;
