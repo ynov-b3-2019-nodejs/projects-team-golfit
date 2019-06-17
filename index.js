@@ -63,17 +63,16 @@ io.sockets.on('connection', (socket) => {
         users[socket.username] = { lvl: data.lvl, pos: { x: data.x, y: data.y } };
         socket.broadcast.emit('spawned', { data: data, user: socket.username });
         socket.emit('users', users);
-        console.log(users);
         db.query(`INSERT INTO username (pseudo, score) VALUES ("Titou", "0")`, (err, result) => {
             if(err) throw err;
                 console.log("Nouveau pseudo ajouté");
                 console.log(result)
             });
+        //console.log(users);
     });
 
     socket.on('shot', (data) => {
         console.log(data);
         socket.broadcast.emit('shoot', { data: data, user: socket.username });
     });
-
 });
