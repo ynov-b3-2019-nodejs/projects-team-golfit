@@ -35,12 +35,10 @@ io.sockets.on('connection', (socket) => {
         users[username] = { lvl: 0, pos: { x: 0, y: 0 } };
         socket.username = username;
         socket.broadcast.emit('notice', username + ' a commencé une partie.')
-        app.post('/', (req, res) => {
-            usernameData = username
-            connection.query("INSERT INTO `username` (pseudo) VALUES ('"+req.body.usernameData+"')", function(err, result){
-            if(err) throw err;
-                console.log("1 record inserted");
-            });
+        db.query("INSERT INTO username (pseudo) VALUES ('"+username+"')", (err, result) => {
+        if(err) throw err;
+            console.log("Nouveau pseudo ajouté");
+            console.log(result)
         });
     });
 
