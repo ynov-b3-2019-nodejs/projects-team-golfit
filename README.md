@@ -4,7 +4,7 @@
 
 - `npm or yarn install`
 - `npm or yarn start`
-- [Go here](localhost:3000)
+- [Go here](http://localhost:3000)
 
 ## Context
 
