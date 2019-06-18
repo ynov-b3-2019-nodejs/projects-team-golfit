@@ -48,7 +48,7 @@ io.sockets.on('connection', (socket) => {
     });
 
     socket.on('shot', (data) => {
-        console.log(data);
+        //console.log(data);
         socket.broadcast.emit('shoot', { data: data, user: socket.username });
     });
 });

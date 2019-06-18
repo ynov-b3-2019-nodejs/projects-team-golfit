@@ -85,7 +85,7 @@ function drawPlayersBalls() {
 }
 
 function createPlayerBall(user, x, y) {
-    console.log('creating ball: ' + user);
+    //console.log('creating ball: ' + user);
     destroyPlayerBall(user);
 
     balls[user] = createSprite(x, y);
@@ -96,9 +96,7 @@ function createPlayerBall(user, x, y) {
 }
 
 function destroyPlayerBall(user) {
-    console.log('destroying ball (1): ' + user);
     if (isPlayerBall(user)) {
-        console.log('destroying ball (2): ' + user);
         balls[user].remove();
     }
 }
@@ -133,13 +131,18 @@ function onPlayerLeave(user) {
 function onPlayerShoot(data) {
     let { lvl, tx, ty } = data.data;
     let user = data.user;
+
+    if(!isPlayerBall(user) && (level + 1) === lvl) {
+        createPlayerBall(user, balls[user].position.x, balls[user].position.y);
+    }
+
     balls[user].setVelocity(tx, ty);
 }
 
 function onPlayerOverlap(data) {
     let { lvl, user } = data;
 
-    console.log(user + '  destroy');
+    //console.log(user + '  destroy');
     destroyPlayerBall(user);
 }
 
@@ -329,7 +332,7 @@ function shot() {
 }
 
 function notice(str) {
-    $('.notice').append('<p class="system">' + str + '</p>');
+    document.querySelector('.notice').innerHTML += '<p class="system">' + str + '</p>';
 }
 
 function draw() {
