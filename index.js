@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
-const mysql = require('mysql');
+/* const mysql = require('mysql');
 
 const db = mysql.createConnection ({
     host: '127.0.0.1',
@@ -10,16 +10,16 @@ const db = mysql.createConnection ({
     user: 'root',
     password: 'password',
     database: 'golfit'
-});
+}); */
 
-db.connect((err) => {
+/* db.connect((err) => {
     if (err) {
         throw err;
     }
     console.log('Connexion à la DB');
 });
 global.db = db;
-
+ */
 server.listen(3000);
 app.use(express.static('public'));
 
@@ -63,10 +63,10 @@ io.sockets.on('connection', (socket) => {
         users[socket.username] = { lvl: data.lvl, pos: { x: data.x, y: data.y } };
         socket.broadcast.emit('spawned', { data: data, user: socket.username });
         socket.emit('users', users);
-        db.query(`INSERT INTO username (pseudo, score) VALUES ("Titou", "0")`, (err, result) => {
+        /* db.query(`INSERT INTO username (pseudo, score) VALUES ("Titou", "0")`, (err, result) => {
             if(err) throw err;
                 console.log("Nouveau pseudo ajouté");
-            });
+            }); */
     });
 
     socket.on('shot', (data) => {
